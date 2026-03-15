@@ -1,53 +1,122 @@
-# Responsible AI Project – AI Index Forecaster
+# Responsible AI Forecasting Framework for E-Governance
 
-End-to-end time-series forecasting and fairness audit on the
-[AI Readiness Index](https://www.tortoisemedia.com/intelligence/global-ai/) dataset.
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-LSTM-orange)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
+![Responsible AI](https://img.shields.io/badge/AI-Fairness-green)
+
+End-to-end **Responsible AI pipeline** for forecasting AI readiness indicators using the **AI Global Index dataset**.
+The project integrates **time-series forecasting models, model evaluation, fairness auditing, and a deployed Streamlit dashboard**.
+
+---
+
+## Dataset
+
+This project uses the **AI Global Index dataset**, which measures how prepared countries are to develop and adopt artificial intelligence.
+
+Dataset Source
+https://www.kaggle.com/datasets/katerynameleshenko/ai-index
+
+The dataset includes:
+
+* AI readiness index score
+* Country-level indicators
+* Regional grouping
+* Multiple AI capability factors
+
+---
+
+## Pipeline Architecture
+
+Dataset
+↓
+Data Preprocessing
+↓
+Exploratory Data Analysis (EDA)
+↓
+Forecasting Models
+
+• ARIMA
+• SARIMA
+• SARIMAX
+• Prophet
+• LSTM
+
+↓
+Model Comparison (RMSE Evaluation)
+↓
+Best Model Selection
+↓
+Fairness Audit (AEQUITAS)
+↓
+Responsible AI Evaluation
+↓
+Streamlit Deployment Dashboard
 
 ---
 
 ## Project Structure
 
 ```
-responsible_ai_project/
-├── app/
-│   └── app.py                    # Streamlit dashboard
-├── checkpoint/
-│   └── lstm_checkpoint.h5        # Best LSTM weights (saved during training)
-├── code/
-│   ├── 01_data_preprocessing.py  # Load, clean & date-index the dataset
-│   ├── 02_EDA.py                 # AutoViz, ADF test, ACF/PACF plots
-│   ├── 03_models_training.py     # ARIMA, SARIMA, SARIMAX, Prophet, LSTM
-│   ├── 04_model_comparison.py    # Per-country evaluation & RMSE comparison
-│   ├── 05_fairness_audit.py      # Aequitas fairness audit by world region
-│   └── 06_final_model_save.py    # Train final LSTM & save model weights
-├── data/
-│   └── AI_index_db.csv           # Raw dataset (place here before running)
-├── model/
-│   └── lstm_model.h5             # Final saved LSTM model
-├── README.md
-└── requirements.txt
+app/
+└── app.py                    # Streamlit dashboard
+
+checkpoint/
+└── lstm_checkpoint.h5
+
+code/
+├── 01_data_preprocessing.py
+├── 02_EDA.py
+├── 03_models_training.py
+├── 04_model_comparison.py
+├── 05_fairness_audit.py
+└── 06_final_model_save.py
+
+data/
+└── AI_index_db.csv
+
+model/
+└── lstm_model.h5
+
+results/
+├── rmse_comparison.png
+├── forecast_plot.png
+└── fairness_audit.png
+
+requirements.txt
+README.md
 ```
 
 ---
 
 ## Quickstart
 
-```bash
-# 1. Install dependencies
+Install dependencies
+
+```
 pip install -r requirements.txt
+```
 
-# 2. Place the dataset
+Place dataset
+
+```
 cp /path/to/AI_index_db.csv data/
+```
 
-# 3. Run pipeline in order
+Run the pipeline
+
+```
 python code/01_data_preprocessing.py
 python code/02_EDA.py
 python code/03_models_training.py
 python code/04_model_comparison.py
 python code/05_fairness_audit.py
 python code/06_final_model_save.py
+```
 
-# 4. Launch dashboard
+Launch Streamlit dashboard
+
+```
 streamlit run app/app.py
 ```
 
@@ -55,26 +124,56 @@ streamlit run app/app.py
 
 ## Models Compared
 
-| Model   | Library       | Type            |
-|---------|---------------|-----------------|
-| ARIMA   | statsmodels / pmdarima | Univariate |
-| SARIMA  | pmdarima      | Seasonal        |
-| SARIMAX | statsmodels   | With exogenous  |
-| Prophet | Meta Prophet  | Decomposition   |
-| LSTM    | TensorFlow/Keras | Deep Learning |
+| Model   | Library                | Type                     |
+| ------- | ---------------------- | ------------------------ |
+| ARIMA   | statsmodels / pmdarima | Statistical              |
+| SARIMA  | pmdarima               | Seasonal                 |
+| SARIMAX | statsmodels            | With exogenous variables |
+| Prophet | Meta Prophet           | Decomposition            |
+| LSTM    | TensorFlow / Keras     | Deep Learning            |
 
 ---
 
-## Fairness
+## Responsible AI Evaluation
 
-Fairness audit uses **Aequitas** to check for disparities in model performance
-across world regions (Americas, Europe, Asia, Africa, Oceania).
+Fairness analysis is performed using **AEQUITAS** to evaluate disparities in model performance across global regions.
+
+Regions evaluated:
+
+* Americas
+* Europe
+* Asia
+* Africa
+* Oceania
+
+---
+
+## Results
+
+### RMSE Model Comparison
+
+![RMSE Comparison](results/rmse_comparison.png)
+
+### Forecast Visualization
+
+![Forecast](results/forecast_plot.png)
+
+### Fairness Audit
+
+![Fairness](results/fairness_audit.png)
+
+---
+
+## Technologies Used
+
+Python • Pandas • NumPy • Scikit-learn • TensorFlow/Keras • Statsmodels
+Prophet • AEQUITAS • Streamlit • AutoViz
 
 ---
 
 ## Notes
 
-- `AI_index_db.csv` has one row per country. Synthetic quarterly time series
-  (2015-Q1 → 2024-Q4) are generated per country for model training.
-- The `checkpoint/lstm_checkpoint.h5` is created automatically by
-  `06_final_model_save.py` via a Keras `ModelCheckpoint` callback.
+* Dataset contains **one row per country**
+* Synthetic quarterly time series generated **2015-Q1 → 2024-Q4**
+* LSTM weights saved automatically using **Keras ModelCheckpoint**
+
