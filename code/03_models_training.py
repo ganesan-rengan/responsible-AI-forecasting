@@ -15,6 +15,7 @@ warnings.filterwarnings("ignore")
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -22,6 +23,9 @@ from statsmodels.tsa.stattools import acf
 
 import pmdarima as pm
 from prophet import Prophet
+
+# ── Create results folder ─────────────────────────────────────────────────────
+os.makedirs("results", exist_ok=True)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 DATA_PATH  = 'data/AI_index_db.csv'
@@ -78,6 +82,10 @@ plt.plot(fc_series,    label='Forecast')
 plt.fill_between(lower_series.index, lower_series, upper_series, color='k', alpha=.15)
 plt.title('ARIMA Forecast vs Actuals')
 plt.legend(loc='upper left', fontsize=8)
+
+# 🔹 Save forecast image for README
+plt.savefig("results/forecast_plot.png", bbox_inches="tight")
+
 plt.show()
 
 # Accuracy metrics
@@ -193,6 +201,7 @@ plt.figure(figsize=(12, 8))
 for country, forecast in forecasts.items():
     future_fc = forecast[forecast['ds'] > pd.Timestamp('2024-12-31')]
     plt.plot(future_fc['ds'], future_fc['yhat'], label=country, alpha=0.6)
+
 plt.title('Prophet Forecasts for All Countries (2025-2026)')
 plt.xlabel('Year')
 plt.ylabel('Total Score')
