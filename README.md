@@ -10,6 +10,19 @@ The project integrates **time-series forecasting models, model evaluation, fairn
 
 ---
 
+## Project Overview
+
+This project demonstrates how **Responsible AI principles can be integrated into forecasting systems used in governance and policy decision environments**.
+
+Key components include:
+
+* Time-series forecasting using statistical and deep learning models
+* Model performance comparison using MAE and RMSE metrics
+* Fairness auditing across global regions using AEQUITAS
+* Deployment of the prediction system using a Streamlit dashboard
+
+---
+
 ## Dataset
 
 This project uses the **AI Global Index dataset**, which measures how prepared countries are to develop and adopt artificial intelligence.
@@ -122,6 +135,17 @@ streamlit run app/app.py
 
 ---
 
+## Repository Usage
+
+This repository can be used for:
+
+* Learning time-series forecasting using multiple models
+* Understanding Responsible AI evaluation workflows
+* Experimenting with fairness auditing in ML systems
+* Demonstrating a deployable ML pipeline using Streamlit
+
+---
+
 ## Models Compared
 
 | Model   | Library                | Type                     |
@@ -136,15 +160,18 @@ streamlit run app/app.py
 
 ## Responsible AI Evaluation
 
-Fairness analysis is performed using **AEQUITAS** to evaluate disparities in model performance across global regions.
+Fairness auditing in this project is implemented using the **AEQUITAS framework**, which evaluates potential disparities in model predictions across different groups.
 
-Regions evaluated:
+The fairness pipeline converts regression predictions into binary outcomes using a median threshold and computes metrics such as:
 
-* Americas
-* Europe
-* Asia
-* Africa
-* Oceania
+- Predicted Positive Rate (PPR)
+- False Positive Rate (FPR)
+- False Negative Rate (FNR)
+
+These metrics are analyzed across groups derived from the dataset (e.g., geographic regions).
+
+**Note:**  
+In the current dataset configuration, the processed data resulted in a **single region group during evaluation**. Since fairness auditing requires multiple groups to compute disparity metrics, the analysis produced limited comparative results. However, the full fairness auditing pipeline using AEQUITAS was successfully implemented as part of the Responsible AI framework.
 
 ---
 
@@ -177,3 +204,8 @@ Prophet • AEQUITAS • Streamlit • AutoViz
 * Synthetic quarterly time series generated **2015-Q1 → 2024-Q4**
 * LSTM weights saved automatically using **Keras ModelCheckpoint**
 
+---
+
+## Support
+
+If you found this project useful, consider giving the repository a ⭐ on GitHub.
