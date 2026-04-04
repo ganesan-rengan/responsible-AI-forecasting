@@ -252,14 +252,5 @@ Otherwise   →  FAIR
 - Africa FNR = N/A is mathematically correct (no true positives exist to miss)
 - LSTM weights saved automatically using Keras `ModelCheckpoint`
 
----
-
-## Author
-
-**Suriya (Nesh)**
-B.Tech — Artificial Intelligence & Data Science
-Final Year | Tamil Nadu, India | 2025–2026
-
----
 
 *If you found this project useful, consider giving the repository a ⭐ on GitHub*
