@@ -215,6 +215,19 @@ Otherwise   →  FAIR
 
 ---
 
+## Results
+
+### RMSE Model Comparison
+![RMSE Comparison](results/rmse_comparison.png)
+
+### ARIMA Forecast vs Actuals
+![Forecast](results/forecast_plot.png)
+
+### AEQUITAS Fairness Audit
+![Fairness Audit](results/fairness_audit.png)
+
+---
+
 ## Technologies Used
 
 | Category      | Technology         | Purpose                        |
