@@ -1,9 +1,9 @@
-attribute_name,attribute_value,ppr,fpr,fnr,n,tp,fp,fn,tn
-region,Africa,0.0,0.0,,5,0,0,0,5
-region,Americas,0.25,0.0,0.0,8,2,0,0,6
-region,Asia-Pacific,0.6429,0.0,0.0,14,9,0,0,5
-region,Europe,0.8966,0.7273,0.0,29,18,8,0,3
-region,Middle East,0.3333,0.0,0.0,6,2,0,0,4
-income_group,High,0.8372,0.5,0.0,43,29,7,0,7
-income_group,Upper middle,0.2222,0.125,0.0,9,1,1,0,7
-income_group,Lower middle,0.1,0.0,0.0,10,1,0,0,9
+attribute_name,attribute_value,ppr,fpr,fnr
+region,Africa,0.0,0.0,
+region,Americas,0.0625,0.0,0.0
+region,Asia-Pacific,0.28125,0.0,0.0
+region,Europe,0.59375,0.09090909090909091,0.0
+region,Middle East,0.0625,0.0,0.0
+income_group,High,0.90625,0.0,0.0
+income_group,Lower middle,0.03125,0.0,0.0
+income_group,Upper middle,0.0625,0.125,0.0
