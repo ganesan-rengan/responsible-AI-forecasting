@@ -4,121 +4,148 @@
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-LSTM-orange)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
 ![Responsible AI](https://img.shields.io/badge/AI-Fairness-green)
+![AEQUITAS](https://img.shields.io/badge/Fairness-AEQUITAS-purple)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-End-to-end **Responsible AI pipeline** for forecasting AI readiness indicators using the **AI Global Index dataset**.
-The project integrates **time-series forecasting models, model evaluation, fairness auditing, and a deployed Streamlit dashboard**.
+> **Core Question:** *Are AI-based forecasting models used in governance contexts fair across all regions and income groups — or do they exhibit systematic bias?*
+
+End-to-end **Responsible AI pipeline** for forecasting AI readiness indicators across 62 countries using the **AI Global Index dataset**. The project integrates time-series forecasting, model evaluation, fairness auditing via AEQUITAS, and a deployed Streamlit dashboard.
 
 ---
 
 ## Project Overview
 
-This project demonstrates how **Responsible AI principles can be integrated into forecasting systems used in governance and policy decision environments**.
+E-Governance systems increasingly adopt AI to automate public service delivery and policy decision-making. While AI improves efficiency, it may introduce **bias and unfairness** — particularly in how it treats different regions and income groups when forecasting AI readiness.
 
-Key components include:
+This project answers the core question through a complete pipeline:
 
-* Time-series forecasting using statistical and deep learning models
-* Model performance comparison using MAE and RMSE metrics
-* Fairness auditing across global regions using AEQUITAS
-* Deployment of the prediction system using a Streamlit dashboard
+- Data preprocessing and automated EDA
+- Five forecasting models trained and compared
+- Formal fairness audit using the **AEQUITAS framework**
+- Interactive Streamlit dashboard with bias verdict cards
+
+---
+
+## Key Results
+
+| Model   | Avg RMSE | Avg MAE | Verdict              |
+|---------|----------|---------|----------------------|
+| ARIMA   | 0.66     | 0.59    | Good baseline        |
+| SARIMA  | **0.29** | **0.25**| **Best model**       |
+| SARIMAX | Failed   | Failed  | Exploded (synthetic exogenous) |
+| Prophet | 0.63     | 0.56    | Close second         |
+| LSTM    | 2.24     | 2.16    | Acceptable           |
+
+### Fairness Audit Findings (AEQUITAS)
+
+| Group        | PPR   | FPR   | Verdict      |
+|--------------|-------|-------|--------------|
+| Africa       | 0.000 | 0.000 | BIASED — never predicted positive |
+| Europe       | 0.667 | 0.909 | BIASED — massively over-predicted |
+| Americas     | 0.071 | 0.167 | FAIR         |
+| Asia-Pacific | 0.190 | 0.000 | FAIR         |
+| High income  | 0.952 | 0.786 | BIASED — over-predicted |
+| Lower middle | 0.000 | 0.000 | BIASED — never predicted positive |
+
+**Conclusion:** The model exhibits significant geographic and income-based bias. Europe is over-predicted at FPR = 0.909, while Africa is never predicted as high-readiness (PPR = 0.000). High income countries are predicted as AI-ready at a rate **8x greater** than Lower middle income countries.
 
 ---
 
 ## Dataset
 
-This project uses the **AI Global Index dataset**, which measures how prepared countries are to develop and adopt artificial intelligence.
+**AI Global Index** — Tortoise Media via Kaggle
 
-Dataset Source
-https://www.kaggle.com/datasets/katerynameleshenko/ai-index
-
-The dataset includes:
-
-* AI readiness index score
-* Country-level indicators
-* Regional grouping
-* Multiple AI capability factors
+| Attribute        | Details                                      |
+|-----------------|----------------------------------------------|
+| Source          | kaggle.com/datasets/katerynameleshenko/ai-index |
+| Countries       | 62                                           |
+| Features        | 13                                           |
+| Target Variable | Total score (0–100)                          |
+| Sensitive Attrs | Region, Income group                         |
+| Regions         | Americas, Europe, Asia-Pacific, Middle East, Africa |
+| Income Groups   | High, Upper middle, Lower middle             |
 
 ---
 
 ## Pipeline Architecture
 
-Dataset
-↓
-Data Preprocessing
-↓
-Exploratory Data Analysis (EDA)
-↓
-Forecasting Models
-
-• ARIMA
-• SARIMA
-• SARIMAX
-• Prophet
-• LSTM
-
-↓
-Model Comparison (RMSE Evaluation)
-↓
-Best Model Selection
-↓
-Fairness Audit (AEQUITAS)
-↓
-Responsible AI Evaluation
-↓
-Streamlit Deployment Dashboard
+```
+Raw Dataset (62 countries, 13 features)
+        ↓
+01_data_preprocessing.py   — AutoViz FixDQ, synthetic date index
+        ↓
+02_EDA.py                  — AutoViz EDA, ADF test, ACF/PACF
+        ↓
+03_models_training.py      — ARIMA, SARIMA, SARIMAX, Prophet
+        ↓
+04_model_comparison.py     — All 5 models × 62 countries (MAE + RMSE)
+        ↓
+    Best Model: SARIMA (RMSE = 0.29)
+        ↓
+05_fairness_audit.py       — AEQUITAS fairness audit (Region + Income)
+        ↓
+06_final_model_save.py     — LSTM saved with ModelCheckpoint
+        ↓
+app/app.py                 — Streamlit dashboard (forecast + fairness)
+```
 
 ---
 
 ## Project Structure
 
 ```
-app/
-└── app.py                    # Streamlit dashboard
-
-checkpoint/
-└── lstm_checkpoint.h5
-
-code/
-├── 01_data_preprocessing.py
-├── 02_EDA.py
-├── 03_models_training.py
-├── 04_model_comparison.py
-├── 05_fairness_audit.py
-└── 06_final_model_save.py
-
-data/
-└── AI_index_db.csv
-
-model/
-└── lstm_model.h5
-
-results/
-├── rmse_comparison.png
-├── forecast_plot.png
-└── fairness_audit.png
-
-requirements.txt
-README.md
+RESPONSIBLE_AI_PROJECT/
+│
+├── app/
+│   └── app.py                    # Streamlit dashboard
+│
+├── checkpoint/
+│   └── lstm_checkpoint.h5        # Best epoch LSTM checkpoint
+│
+├── code/
+│   ├── 01_data_preprocessing.py  # Data loading + FixDQ cleaning
+│   ├── 02_EDA.py                 # AutoViz EDA + ADF stationarity
+│   ├── 03_models_training.py     # ARIMA, SARIMA, SARIMAX, Prophet
+│   ├── 04_model_comparison.py    # 5-model RMSE comparison
+│   ├── 05_fairness_audit.py      # AEQUITAS fairness audit
+│   └── 06_final_model_save.py    # Final LSTM with ModelCheckpoint
+│
+├── data/
+│   ├── AI_index_db.csv           # Raw dataset
+│   └── AI_index_db_clean.csv     # Cleaned dataset
+│
+├── model/
+│   └── lstm_model.h5             # Final trained LSTM weights
+│
+├── results/
+│   ├── fairness_audit.png        # 6-panel AEQUITAS dark theme chart
+│   ├── fairness_summary.csv      # PPR, FPR, FNR + verdict per group
+│   ├── rmse_comparison.png       # Model comparison bar chart
+│   └── forecast_plot.png         # ARIMA forecast vs actuals
+│
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
 ## Quickstart
 
-Install dependencies
+### 1. Install dependencies
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
-Place dataset
+### 2. Place dataset
 
-```
+```bash
 cp /path/to/AI_index_db.csv data/
 ```
 
-Run the pipeline
+### 3. Run the full pipeline
 
-```
+```bash
 python code/01_data_preprocessing.py
 python code/02_EDA.py
 python code/03_models_training.py
@@ -127,85 +154,99 @@ python code/05_fairness_audit.py
 python code/06_final_model_save.py
 ```
 
-Launch Streamlit dashboard
+### 4. Launch Streamlit dashboard
 
-```
+```bash
 streamlit run app/app.py
 ```
 
+Open `http://localhost:8501` in your browser.
+
 ---
 
-## Repository Usage
+## Dashboard Pages
 
-This repository can be used for:
-
-* Learning time-series forecasting using multiple models
-* Understanding Responsible AI evaluation workflows
-* Experimenting with fairness auditing in ML systems
-* Demonstrating a deployable ML pipeline using Streamlit
+| Page | What It Shows |
+|------|--------------|
+| Dataset Preview | 62-country AI Index table + score distribution by region |
+| Country Forecast | Select any country → LSTM forecast chart + RMSE metric |
+| Fairness Audit | AEQUITAS metrics table + bar chart + verdict cards (FAIR/BIASED) |
 
 ---
 
 ## Models Compared
 
-| Model   | Library                | Type                     |
-| ------- | ---------------------- | ------------------------ |
-| ARIMA   | statsmodels / pmdarima | Statistical              |
-| SARIMA  | pmdarima               | Seasonal                 |
-| SARIMAX | statsmodels            | With exogenous variables |
-| Prophet | Meta Prophet           | Decomposition            |
-| LSTM    | TensorFlow / Keras     | Deep Learning            |
+| Model   | Library                | Type                     | Best For                    |
+|---------|------------------------|--------------------------|-----------------------------|
+| ARIMA   | statsmodels / pmdarima | Statistical              | Non-seasonal short series   |
+| SARIMA  | pmdarima               | Seasonal Statistical     | Quarterly seasonal patterns |
+| SARIMAX | statsmodels            | Seasonal + Exogenous     | External factor influence   |
+| Prophet | Meta Prophet           | Decomposition            | Trend + seasonality         |
+| LSTM    | TensorFlow / Keras     | Deep Learning            | Non-linear temporal patterns|
 
 ---
 
 ## Responsible AI Evaluation
 
-Fairness auditing in this project is implemented using the **AEQUITAS framework**, which evaluates potential disparities in model predictions across different groups.
+Fairness auditing is implemented using the **AEQUITAS framework** (University of Chicago), which evaluates whether a model makes predictions that are equally fair across different demographic or geographic groups.
 
-The fairness pipeline converts regression predictions into binary outcomes using a median threshold and computes metrics such as:
+### Binary Classification Setup
 
-- Predicted Positive Rate (PPR)
-- False Positive Rate (FPR)
-- False Negative Rate (FNR)
+- **Threshold** = Median Total score of all 62 countries
+- **Label 1** = Countries with Total score > threshold (High AI readiness)
+- **Label 0** = Countries with Total score ≤ threshold (Low AI readiness)
+- **Sensitive attributes audited:** Region (5 groups) + Income group (3 groups)
 
-These metrics are analyzed across groups derived from the dataset (e.g., geographic regions).
+### Fairness Metrics
 
-**Note:**  
-In the current dataset configuration, the processed data resulted in a **single region group during evaluation**. Since fairness auditing requires multiple groups to compute disparity metrics, the analysis produced limited comparative results. However, the full fairness auditing pipeline using AEQUITAS was successfully implemented as part of the Responsible AI framework.
+| Metric | Meaning |
+|--------|---------|
+| PPR | Predicted Positive Rate — how often model predicts *high readiness* |
+| FPR | False Positive Rate — how often model *wrongly* predicts high readiness |
+| FNR | False Negative Rate — how often model *misses* a genuinely high-readiness country |
 
----
+### Verdict Rule
 
-## Results
-
-### RMSE Model Comparison
-
-![RMSE Comparison](results/rmse_comparison.png)
-
-### Forecast Visualization
-
-![Forecast](results/forecast_plot.png)
-
-### Fairness Audit
-
-![Fairness](results/fairness_audit.png)
+```
+FPR > 0.20  →  BIASED (model over-predicts this group)
+PPR = 0.000 →  BIASED (model never predicts this group as positive)
+Otherwise   →  FAIR
+```
 
 ---
 
 ## Technologies Used
 
-Python • Pandas • NumPy • Scikit-learn • TensorFlow/Keras • Statsmodels
-Prophet • AEQUITAS • Streamlit • AutoViz
+| Category      | Technology         | Purpose                        |
+|---------------|--------------------|--------------------------------|
+| Language      | Python 3.10+       | Core development               |
+| Data          | Pandas + NumPy     | Data manipulation              |
+| EDA           | AutoViz            | Automated EDA + FixDQ          |
+| Stats Models  | statsmodels        | ARIMA, SARIMA, SARIMAX         |
+| Auto ARIMA    | pmdarima           | Automatic order selection      |
+| Forecasting   | Prophet            | Trend + seasonality            |
+| Deep Learning | TensorFlow / Keras | LSTM model                     |
+| Fairness      | AEQUITAS           | Responsible AI audit           |
+| Visualization | Matplotlib/Seaborn | Charts + dark theme plots      |
+| Dashboard     | Streamlit          | Interactive web application    |
 
 ---
 
 ## Notes
 
-* Dataset contains **one row per country**
-* Synthetic quarterly time series generated **2015-Q1 → 2024-Q4**
-* LSTM weights saved automatically using **Keras ModelCheckpoint**
+- Dataset contains **one snapshot per country** — synthetic quarterly series generated from 2015-Q1 to 2024-Q4
+- SARIMAX failed due to synthetic random exogenous variable — acknowledged limitation
+- Africa FNR = N/A is mathematically correct (no true positives exist to miss)
+- LSTM weights saved automatically using Keras `ModelCheckpoint`
 
 ---
 
-## Support
+## Author
 
-If you found this project useful, consider giving the repository a ⭐ on GitHub.
+**Suriya (Nesh)**
+B.Tech — Artificial Intelligence & Data Science
+Final Year | Tamil Nadu, India | 2025–2026
+
+---
+
+*If you found this project useful, consider giving the repository a ⭐ on GitHub*
