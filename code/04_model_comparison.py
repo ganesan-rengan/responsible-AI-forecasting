@@ -148,7 +148,6 @@ def evaluate_country(country_name, country_data):
 
     # ── Prophet ───────────────────────────────────────────────────────────────
     try:
-
         pm_model = Prophet(
             yearly_seasonality=False,
             weekly_seasonality=False,
@@ -161,13 +160,17 @@ def evaluate_country(country_name, country_data):
             fourier_order=3
         )
 
+        # train must have ds as a column — guaranteed since we no longer set_index
         pm_model.fit(train[['ds', 'y']])
 
-        future = pm_model.make_future_dataframe(periods=4, freq='QE')
+        # Use 'QS' (quarter start) which is compatible with all pandas versions
+        future = pm_model.make_future_dataframe(periods=4, freq='QS')
 
         forecast = pm_model.predict(future)
 
-        fc = forecast.set_index('ds').reindex(test['ds'])['yhat'].values
+        # Take the last 4 rows of the forecast (the future periods)
+        # This avoids reindex date-matching issues entirely
+        fc = forecast['yhat'].values[-4:]
 
         results['Prophet_MAE'] = mean_absolute_error(y_test, fc)
         results['Prophet_RMSE'] = np.sqrt(mean_squared_error(y_test, fc))
@@ -242,10 +245,9 @@ all_results = []
 
 for country in tqdm(all_ts['country'].unique(), desc="Evaluating all models"):
 
-    country_data = all_ts[all_ts['country'] == country].sort_values('ds')
-
-    country_data = country_data.set_index('ds')
-    country_data.index.freq = 'Q'
+    # Keep ds as a COLUMN so Prophet can access train[['ds', 'y']]
+    # Do NOT set_index('ds') — that removes ds from columns and breaks Prophet
+    country_data = all_ts[all_ts['country'] == country].sort_values('ds').reset_index(drop=True)
 
     all_results.append(
         evaluate_country(country, country_data)

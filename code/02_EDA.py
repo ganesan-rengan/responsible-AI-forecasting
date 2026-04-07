@@ -7,11 +7,13 @@ Exploratory Data Analysis on the AI Index dataset.
 - Stationarity test (ADF)
 - ACF / PACF plots (original, 1st and 2nd differencing)
 - Seasonal vs Usual differencing comparison
+All figures are auto-saved to results/ folder.
 """
 
 import warnings
 warnings.filterwarnings("ignore")
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,6 +24,8 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 # ── Config ────────────────────────────────────────────────────────────────────
 DATA_PATH  = 'data/AI_index_db.csv'
 START_DATE = '2000-01-01'
+
+os.makedirs('results', exist_ok=True)
 
 # ── 1. Load and prepare data ──────────────────────────────────────────────────
 df = pd.read_csv(DATA_PATH)
@@ -62,24 +66,35 @@ axes[2, 0].plot(df['value'].diff().diff())
 axes[2, 0].set_title('2nd Order Differencing')
 plot_acf(df['value'].diff().diff().dropna(), ax=axes[2, 1])
 plt.tight_layout()
+plt.savefig('results/eda_acf_differencing.png', dpi=150, bbox_inches='tight')
+print("Saved → results/eda_acf_differencing.png")
 plt.show()
+plt.close()
 
-# PACF of 1st differenced series
+# ── PACF of 1st differenced series ───────────────────────────────────────────
 plt.rcParams.update({'figure.figsize': (9, 3), 'figure.dpi': 120})
 fig, axes = plt.subplots(1, 2, sharex=True)
 axes[0].plot(df['value'].diff())
 axes[0].set_title('1st Differencing')
 axes[1].set(ylim=(0, 5))
 plot_pacf(df['value'].diff().dropna(), ax=axes[1])
+plt.tight_layout()
+plt.savefig('results/eda_pacf_1st_diff.png', dpi=150, bbox_inches='tight')
+print("Saved → results/eda_pacf_1st_diff.png")
 plt.show()
+plt.close()
 
-# ACF of 1st differenced series
+# ── ACF of 1st differenced series ────────────────────────────────────────────
 fig, axes = plt.subplots(1, 2, sharex=True)
 axes[0].plot(df['value'].diff())
 axes[0].set_title('1st Differencing')
 axes[1].set(ylim=(0, 1.2))
 plot_acf(df['value'].diff().dropna(), ax=axes[1])
+plt.tight_layout()
+plt.savefig('results/eda_acf_1st_diff.png', dpi=150, bbox_inches='tight')
+print("Saved → results/eda_acf_1st_diff.png")
 plt.show()
+plt.close()
 
 # ── 5. Seasonal vs Usual differencing ────────────────────────────────────────
 fig, axes = plt.subplots(2, 1, figsize=(10, 5), dpi=100, sharex=True)
@@ -94,6 +109,9 @@ axes[1].set_title('Seasonal Differencing')
 plt.legend(loc='upper left', fontsize=10)
 plt.suptitle('AI Index - Time Series Dataset', fontsize=16)
 plt.tight_layout()
+plt.savefig('results/eda_seasonal_differencing.png', dpi=150, bbox_inches='tight')
+print("Saved → results/eda_seasonal_differencing.png")
 plt.show()
+plt.close()
 
-print("\nEDA complete.")
+print("\nEDA complete. All figures saved to results/")

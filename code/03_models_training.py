@@ -7,6 +7,7 @@ Trains time-series models on the AI Index dataset:
   - SARIMA (auto via pmdarima)
   - SARIMAX (seasonal exogenous variable)
   - Prophet (per-country synthetic series)
+All figures are auto-saved to results/ folder.
 """
 
 import warnings
@@ -52,11 +53,14 @@ print(fitted_arima.summary())
 
 # Residuals plot
 residuals = pd.DataFrame(fitted_arima.resid)
-fig, ax = plt.subplots(1, 2)
+fig, ax = plt.subplots(1, 2, figsize=(10, 4))
 residuals.plot(title="Residuals", ax=ax[0])
 residuals.plot(kind='kde', title='Density', ax=ax[1])
 plt.tight_layout()
+plt.savefig("results/arima_residuals.png", dpi=150, bbox_inches="tight")
+print("Saved → results/arima_residuals.png")
 plt.show()
+plt.close()
 
 # Actual vs Fitted
 fitted_values = fitted_arima.predict(dynamic=False)
@@ -65,7 +69,11 @@ plt.plot(df['value'], label='Actual Values')
 plt.plot(fitted_values, label='Fitted Values', color='red')
 plt.title('Actual vs Fitted Values')
 plt.legend()
+plt.tight_layout()
+plt.savefig("results/arima_actual_vs_fitted.png", dpi=150, bbox_inches="tight")
+print("Saved → results/arima_actual_vs_fitted.png")
 plt.show()
+plt.close()
 
 # Forecast
 forecast_results = fitted_arima.get_forecast(steps=len(test))
@@ -82,11 +90,11 @@ plt.plot(fc_series,    label='Forecast')
 plt.fill_between(lower_series.index, lower_series, upper_series, color='k', alpha=.15)
 plt.title('ARIMA Forecast vs Actuals')
 plt.legend(loc='upper left', fontsize=8)
-
-# 🔹 Save forecast image for README
-plt.savefig("results/forecast_plot.png", bbox_inches="tight")
-
+plt.tight_layout()
+plt.savefig("results/forecast_plot.png", dpi=150, bbox_inches="tight")
+print("Saved → results/forecast_plot.png")
 plt.show()
+plt.close()
 
 # Accuracy metrics
 def forecast_accuracy(forecast, actual):
@@ -122,7 +130,11 @@ plt.plot(idx, fc_auto, color='darkgreen', label='Forecast')
 plt.fill_between(idx, confint_auto[:, 0], confint_auto[:, 1], color='k', alpha=.15)
 plt.title("Auto-ARIMA Final Forecast")
 plt.legend()
+plt.tight_layout()
+plt.savefig("results/auto_arima_forecast.png", dpi=150, bbox_inches="tight")
+print("Saved → results/auto_arima_forecast.png")
 plt.show()
+plt.close()
 
 # ── 4. SARIMA ─────────────────────────────────────────────────────────────────
 print("\n--- SARIMA ---")
@@ -132,9 +144,16 @@ smodel = pm.auto_arima(df['value'], start_p=1, start_q=1,
                        trace=True, error_action='ignore',
                        suppress_warnings=True, stepwise=True)
 print(smodel.summary())
-smodel.plot_diagnostics(figsize=(10, 8))
-plt.show()
 
+# SARIMA diagnostics
+smodel.plot_diagnostics(figsize=(10, 8))
+plt.tight_layout()
+plt.savefig("results/sarima_diagnostics.png", dpi=150, bbox_inches="tight")
+print("Saved → results/sarima_diagnostics.png")
+plt.show()
+plt.close()
+
+# SARIMA forecast
 fitted_s, confint_s = smodel.predict(n_periods=N_FORECAST, return_conf_int=True)
 index_of_fc = pd.date_range(df.index[-1], periods=N_FORECAST, freq='MS')
 plt.figure(figsize=(10, 4))
@@ -143,7 +162,11 @@ plt.plot(pd.Series(fitted_s, index=index_of_fc), color='darkgreen', label='Forec
 plt.fill_between(index_of_fc, confint_s[:, 0], confint_s[:, 1], color='k', alpha=.15)
 plt.title("SARIMA Final Forecast")
 plt.legend()
+plt.tight_layout()
+plt.savefig("results/sarima_forecast.png", dpi=150, bbox_inches="tight")
+print("Saved → results/sarima_forecast.png")
 plt.show()
+plt.close()
 
 # ── 5. SARIMAX ────────────────────────────────────────────────────────────────
 print("\n--- SARIMAX ---")
@@ -208,6 +231,9 @@ plt.ylabel('Total Score')
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small')
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("results/prophet_all_countries_forecast.png", dpi=150, bbox_inches="tight")
+print("Saved → results/prophet_all_countries_forecast.png")
 plt.show()
+plt.close()
 
-print("\nModels training complete.")
+print("\nModels training complete. All figures saved to results/")
