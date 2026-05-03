@@ -95,16 +95,11 @@ metrics_df = pd.DataFrame({
 })
 metrics_df.to_csv(f"{RESULTS_DIR}/classification_metrics.csv", index=False)
 
-# ═══════════════════════════════════════════════════════
-# 🔥 CONFUSION MATRIX (PNG)
-# ═══════════════════════════════════════════════════════
-
+# Confusion Matrix
 cm = confusion_matrix(label_value, score)
 
-print("\nConfusion Matrix:")
-print(cm)
-
 plt.figure(figsize=(5,4))
+
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
             xticklabels=["Pred 0", "Pred 1"],
             yticklabels=["Actual 0", "Actual 1"])
@@ -115,49 +110,3 @@ plt.title("Confusion Matrix")
 
 plt.savefig(f"{RESULTS_DIR}/confusion_matrix.png")
 plt.close()
-
-print("Saved confusion_matrix.png")
-
-# ═══════════════════════════════════════════════════════
-# 🔥 AEQUITAS FAIRNESS
-# ═══════════════════════════════════════════════════════
-
-aeq_df = pd.DataFrame({
-    'score': score,
-    'label_value': label_value,
-    'region': df['Region'],
-    'income_group': df['Income group']
-})
-
-g = Group()
-xtab, _ = g.get_crosstabs(aeq_df)
-
-b = Bias()
-bdf = b.get_disparity_predefined_groups(
-    xtab,
-    original_df=aeq_df,
-    ref_groups_dict={'region': 'Americas', 'income_group': 'High'},
-    alpha=0.05
-)
-
-f = Fairness()
-fdf = f.get_group_value_fairness(bdf)
-
-print("\nFairness Results:")
-print(fdf[['attribute_name','attribute_value','ppr','fpr','fnr']])
-
-# ── Verdict Logic ─────────────────────────────────────
-def verdict(row):
-    if row['fpr'] > 0.20 or row['ppr'] == 0:
-        return "BIASED"
-    return "FAIR"
-
-fdf['verdict'] = fdf.apply(verdict, axis=1)
-
-# Save fairness summary
-fdf.to_csv(f"{RESULTS_DIR}/fairness_summary.csv", index=False)
-
-print("\nFairness Verdict:")
-print(fdf[['attribute_value','ppr','fpr','fnr','verdict']])
-
-print("\n✅ All results saved in /results/")

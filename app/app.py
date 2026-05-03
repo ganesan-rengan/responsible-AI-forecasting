@@ -387,3 +387,44 @@ elif page == "⚖️ Fairness Audit":
 
     except Exception as e:
         st.warning(f"Fairness results not available. Run `05_fairness_audit.py` first.\n\nError: {e}")
+
+
+# ═══════════════════════════════════════════════════════════════
+# 📊 Classification Metrics (NEW)
+# ═══════════════════════════════════════════════════════════════
+
+RESULTS_METRICS = os.path.join(BASE_DIR, '..', 'results', 'classification_metrics.csv')
+CONF_MATRIX_IMG = os.path.join(BASE_DIR, '..', 'results', 'confusion_matrix.png')
+
+st.markdown("---")
+st.subheader("📊 Classification Performance")
+
+try:
+    metrics_df = pd.read_csv(RESULTS_METRICS)
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    metric_map = dict(zip(metrics_df["Metric"], metrics_df["Value"]))
+
+    col1.metric("Accuracy",  f"{metric_map.get('Accuracy', 0):.4f}")
+    col2.metric("Precision", f"{metric_map.get('Precision', 0):.4f}")
+    col3.metric("Recall",    f"{metric_map.get('Recall', 0):.4f}")
+    col4.metric("F1 Score",  f"{metric_map.get('F1 Score', 0):.4f}")
+
+except Exception as e:
+    st.warning(f"Classification metrics not found. Run fairness script.\n\nError: {e}")
+
+# ═══════════════════════════════════════════════════════════════
+# 🔲 Confusion Matrix (PNG)
+# ═══════════════════════════════════════════════════════════════
+
+st.markdown("#### 🔲 Confusion Matrix")
+
+try:
+    if os.path.exists(CONF_MATRIX_IMG):
+        st.image(CONF_MATRIX_IMG, width=400)
+    else:
+        st.warning("Confusion matrix image not found. Run fairness script first.")
+
+except Exception as e:
+    st.warning(f"Error loading confusion matrix: {e}")
